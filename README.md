@@ -35,20 +35,30 @@ Perform speech recognition with exceptional handling:<Br>
 ## PROGRAM:
 ```
 import speech_recognition as sr
-r = sr.Recognizer()
-duration = 30
-print("Say something")
-with sr.Microphone() as source:
-    audio_data = r.listen(source,timeout=duration)
 
-try:
-    text= r.recognize_google(audio_data)
-except sr.UnknownValueError:
-    print("Sorry, couldn't understand the audio")
-except sr.RequestError as e:
-    print(f'Error with request tp Google Speech Recognition service: {e}')
-except Exception as e:
-    print(f'Error : {e}')
+def record_audio():
+    r = sr.Recognizer()
+    r.energy_threshold = 6000
+    voice_data = ''
+    try:
+        with sr.Microphone() as source:
+            print("Listening...")
+            audio = r.listen(source)
+            voice_data = r.recognize_google(audio, language='en-US')
+    except sr.UnknownValueError:
+        print("Unable to recognize audio.")
+    except sr.RequestError:
+        print("Network error.")
+    return voice_data.lower()
+
+# Main loop
+while True:
+    command = record_audio()
+    print("You said:", command)
+    
+    if command in ['stop', 'close', 'exit']:
+        print("Exiting voice assistant.")
+        break
 ```
 
 ## OUTPUT:
